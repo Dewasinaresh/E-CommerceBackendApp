@@ -1,26 +1,26 @@
 package com.nd.electronic.web.MTechDistributions.Services;
 
-import com.nd.electronic.web.MTechDistributions.DTOS.UserDto;
-import com.nd.electronic.web.MTechDistributions.Entitys.UserEntity;
-import org.apache.catalina.User;
-import org.springframework.stereotype.Component;
+import com.nd.electronic.web.MTechDistributions.DTOS.UserDTO;
+import com.nd.electronic.web.MTechDistributions.Entitys.PageableResponse;
 
-import java.util.List;
+import java.io.IOException;
 
 public interface UserService {
     //create
-    public UserDto createUser(UserDto userDto);
+    public UserDTO createUser(UserDTO userDto);
 
     //Update User
-    public UserEntity updateUser(UserDto userDto, String UserId);
+    public UserDTO updateUser(UserDTO userDto, String UserId);
 
     //delete User
-    public String deleteUser(String userId);
+    public String deleteUser(String userId) throws IOException;
+
 
     //getUser
-    public List<UserDto> getAllUserDto();
-    public UserDto getUserByName(String userName);
+    public PageableResponse<UserDTO> getAllUserDto(int pageNumber, int pageSize, String sortBy, String sortDir);
+    public UserDTO getUserByName(String userName);
 
-    public UserDto getUserByEmail(String Email);
+    public UserDTO getUserByEmail(String Email);
+    public UserDTO getUserById(String userId);
 
 }

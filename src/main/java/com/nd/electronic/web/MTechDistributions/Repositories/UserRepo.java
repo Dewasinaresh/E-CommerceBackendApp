@@ -1,6 +1,5 @@
 package com.nd.electronic.web.MTechDistributions.Repositories;
 
-import com.nd.electronic.web.MTechDistributions.DTOS.UserDto;
 import com.nd.electronic.web.MTechDistributions.Entitys.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

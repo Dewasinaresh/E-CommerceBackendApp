@@ -1,28 +1,44 @@
 package com.nd.electronic.web.MTechDistributions.Services.impl;
 
-import com.nd.electronic.web.MTechDistributions.DTOS.UserDto;
+import com.nd.electronic.web.MTechDistributions.DTOS.UserDTO;
+import com.nd.electronic.web.MTechDistributions.Entitys.PageableResponse;
 import com.nd.electronic.web.MTechDistributions.Entitys.UserEntity;
 import com.nd.electronic.web.MTechDistributions.Repositories.UserRepo;
 import com.nd.electronic.web.MTechDistributions.Services.UserService;
+import com.nd.electronic.web.MTechDistributions.Utility.GeneratePageableResponse;
+import com.nd.electronic.web.MTechDistributions.exceptionUtils.ResouceNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepo userRepo;
-
+    @Autowired
+    PageableResponse<UserDTO> response;
     @Autowired
     private ModelMapper Models;
+    Logger log= LoggerFactory.getLogger(UserServiceImpl.class);
+    @Value("$(user.profiler.file.path)")
+    private String filePath="";
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDTO createUser(UserDTO userDto) {
         String rondomUserId = UUID.randomUUID().toString();
         userDto.setUserId( rondomUserId );
         // convert UserDto into userEntity
@@ -30,55 +46,49 @@ public class UserServiceImpl implements UserService {
 
         final UserEntity savedUser = userRepo.save(userEntity);
         // Convert UserEntity into userDto
-        UserDto newUserDto = userEntityToDto(savedUser);
+        UserDTO newUserDTO = userEntityToDto(savedUser);
 
         //return new saved users
-        return newUserDto;
+        return newUserDTO;
 
     }
 
 
     @Override
-    public UserEntity updateUser(UserDto userDto, String UserId) {
+    public UserDTO updateUser(UserDTO userDto, String UserId) {
 
         // get user entity from Repository
-        final UserEntity userEntity = userRepo.findById(UserId).orElseThrow(() -> new RuntimeException(" User is not find "));
+        final UserEntity userEntity = userRepo.findById(UserId).orElseThrow(() -> new ResouceNotFoundException(" User is not find "));
         //convert  entity into DTO
-        final UserDto userDto1 = userEntityToDto(userEntity);
-        //Update User
-        final UserDto buildUserDto = userDto1.builder()
-                .name(userDto.getName())
-                .gender(userDto.getGender())
-                .password(userDto.getPassword())
-                .about(userDto.getAbout())
-                .email(userDto.getEmail()).build();
-        //  Convert and return
-        return userDtoIntoEntity(buildUserDto);
+        final UserDTO userDTO1 = userEntityToDto(userEntity);
+         return userDTO1;
     }
 
 
     @Override
-    public String deleteUser(String userId) {
-        final UserEntity userEntity = userRepo.findById(userId).orElseThrow(() -> new RuntimeException(" User is not find "));
+    public String deleteUser(String userId) throws IOException {
+
+        final UserEntity userEntity = userRepo.findById(userId).orElseThrow(() -> new ResouceNotFoundException(" User is not find "));
+        String fullFilePath =filePath+userEntity.getImageName();
+        Files.delete(Path.of(fullFilePath));
+        log.info("file is deleted from {}",fullFilePath);
         userRepo.delete(userEntity);
-
-
         return "Deleted User whose ID is "+userId;
     }
 
     @Override
-    public List<UserDto> getAllUserDto() {
-
-        final List<UserEntity> allUser = userRepo.findAll();
-
-        final List<UserDto> ListUseDto = allUser.stream().map(user -> userEntityToDto(user)).collect(Collectors.toList());
-
-        return ListUseDto;
+    public PageableResponse<UserDTO> getAllUserDto(int pageNumber, int pageSize, String sortBy, String sortDir)
+    {
+        Sort sort= ((sortDir.equalsIgnoreCase("desc"))?(Sort.by(sortBy).descending()):(Sort.by(sortBy).ascending()));
+        Pageable pageable= PageRequest.of(pageNumber,pageSize,sort);
+        final Page<UserEntity> specificPageData = userRepo.findAll(pageable);
+        response= GeneratePageableResponse.generatePageResponse(specificPageData, UserDTO.class);
+        return response;
 
     }
 
     @Override
-    public UserDto getUserByName(String userName) {
+    public UserDTO getUserByName(String userName) {
 
         // We will do for finderMethods
         final UserEntity userEntity = userRepo.findByName(userName);
@@ -87,17 +97,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserByEmail(String Email)
+    public UserDTO getUserByEmail(String Email)
     {
         final UserEntity UserByEmail = userRepo.findByEmail(Email);
-        final UserDto userDto = userEntityToDto(UserByEmail);
+        final UserDTO userDto = userEntityToDto(UserByEmail);
         return userDto;
     }
 
 
 
 
-    private UserDto userEntityToDto(UserEntity savedUser) {
+    private UserDTO userEntityToDto(UserEntity savedUser) {
 
 
 //        final UserDto buildUserDto = UserDto.builder()
@@ -109,11 +119,11 @@ public class UserServiceImpl implements UserService {
 //                .about(savedUser.getAbout())
 //                .build();
 
-        return Models.map(savedUser, UserDto.class );
+        return Models.map(savedUser, UserDTO.class );
     }
 
 
-    private UserEntity userDtoIntoEntity(UserDto userDto) {
+    private UserEntity userDtoIntoEntity(UserDTO userDto) {
 
         //DTO to Entity
 //        final UserEntity buildUser = UserEntity.builder()
@@ -126,5 +136,12 @@ public class UserServiceImpl implements UserService {
 //                .build();
 
         return  Models.map(userDto,UserEntity.class);
+    }
+
+    @Override
+    public UserDTO getUserById(String userId) {
+        final List<UserEntity> byId = userRepo.findAllById(Collections.singleton(userId));
+        final UserDTO userDto = userEntityToDto((UserEntity) byId);
+        return userDto;
     }
 }

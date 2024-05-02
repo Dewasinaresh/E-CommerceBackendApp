@@ -1,6 +1,7 @@
 package com.nd.electronic.web.MTechDistributions.Entitys;
 
 
+import com.nd.electronic.web.MTechDistributions.validatorUtils.ImageName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -27,5 +28,12 @@ public class UserEntity {
     private String gender;
     @Column(name = "User_about",length =1000)
     private String about;
+
+    @Column(name = "User_ImageName")
+    private String imageName;
+
+    @Column(name="Cart_Id")
+    private CartEntity cart;
+
 
 }
