@@ -17,7 +17,7 @@ public class UserDTO {
 
     private String userId;
     @NotNull(message = "Null name is not allowed")
-    @Size(min=10,max =20, message = "size is matched")
+    @Size(min=10,max =20, message = "size is  not matched")
     @NotBlank(message="name  is blank")
     private String name;
     @NotBlank(message = "email is blank")

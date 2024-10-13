@@ -48,7 +48,7 @@ public class CartServiceImp implements CartService {
         final UserEntity userDetails = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("user is not found for Id :" + userId));
         CartEntity cart=null;
         try{
-           cart = cartRepo.findByUserEntity(userDetails);
+           cart = cartRepo.findByUserEntity(userDetails).get();
         }
         catch (NoSuchElementException e)
         {
@@ -102,7 +102,7 @@ public class CartServiceImp implements CartService {
     public void clearCart(String userId) {
 
         final UserEntity userDetails = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
-        final CartEntity cartDetails = cartRepo.findByUserEntity(userDetails);
+        final CartEntity cartDetails = cartRepo.findByUserEntity(userDetails).get();
         cartDetails.getCartList().clear();
         final CartEntity updatedCart = cartRepo.save(cartDetails);
 
@@ -111,7 +111,7 @@ public class CartServiceImp implements CartService {
     @Override
     public CartDTO getCartByUser(String userId){
         final UserEntity userDetails = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
-        final CartEntity cartDetails = cartRepo.findByUserEntity(userDetails);
+        final CartEntity cartDetails = cartRepo.findByUserEntity(userDetails).get();
         return mapper.map(cartDetails,CartDTO.class);
     }
 

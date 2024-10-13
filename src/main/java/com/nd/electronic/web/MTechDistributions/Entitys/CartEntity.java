@@ -9,18 +9,18 @@ import org.hibernate.type.SqlTypes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+@Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
 @Table(name = "Carts")
 public class CartEntity {
 
     @Id
     private String cartId;
+
     private Date cartdate;
 
     //One user having only one cart
@@ -31,9 +31,8 @@ public class CartEntity {
      *  Cart having Lots of Items.
      *  req OneToMany with cartitem
      */
-    @OneToMany(mappedBy = "cartEntity",cascade = CascadeType.ALL,fetch = FetchType.EAGER,orphanRemoval = true)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    List<CartItemsEntity> cartList=new ArrayList<>();
+   @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
+   private List<CartItemsEntity> cartList=new ArrayList<>();
 
 
 

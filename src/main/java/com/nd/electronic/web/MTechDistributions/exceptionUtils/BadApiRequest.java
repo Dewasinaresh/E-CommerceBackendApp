@@ -4,7 +4,7 @@ public class BadApiRequest extends RuntimeException{
     public BadApiRequest(){
         super("Bad Request");
     }
-    BadApiRequest(String msg){
+   public BadApiRequest(String msg){
         super(msg);
     }
 }

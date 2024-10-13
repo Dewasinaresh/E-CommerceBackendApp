@@ -5,8 +5,10 @@ import com.nd.electronic.web.MTechDistributions.Entitys.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CartRepo extends JpaRepository<CartEntity,String> {
 
-    public CartEntity findByUserEntity(UserEntity userEntity);
+    public Optional<CartEntity> findByUserEntity(UserEntity userEntity);
 }
