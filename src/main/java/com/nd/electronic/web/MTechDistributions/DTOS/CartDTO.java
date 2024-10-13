@@ -21,7 +21,7 @@ public class CartDTO
     private Date cartdate;
     //One user having only one cart
     private UserEntity userEntity;
-    List<CartEntity> cartList=new ArrayList<>();
+    List<CartItemDTO> cartList=new ArrayList<>();
 
 
 

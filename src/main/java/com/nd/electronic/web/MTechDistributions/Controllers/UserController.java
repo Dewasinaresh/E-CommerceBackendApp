@@ -7,6 +7,7 @@ import com.nd.electronic.web.MTechDistributions.Entitys.PageableResponse;
 import com.nd.electronic.web.MTechDistributions.Services.FileUploadService;
 import com.nd.electronic.web.MTechDistributions.Services.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class UserController {
     @Value("$(user.profiler.file.path)")
     private final String filePath="";
     @PostMapping("/createNewUser")
-    public ResponseEntity<UserDTO> createUser(@Validated @RequestBody UserDTO userDto){
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDto){
         final UserDTO savedNewUser = userService.createUser(userDto);
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
     }
